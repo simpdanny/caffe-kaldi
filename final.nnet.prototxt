@@ -1,0 +1,156 @@
+name:"baseline/German"
+layers {
+    name: "German_data"
+    type: HDF5_DATA
+    top: "German_data"
+    top: "German_label"
+    hdf5_data_param {
+        source: "caffe/feat/German/train.list"
+        batch_size: 256
+        shuffle: true
+    }
+    include: { phase: TRAIN }
+}
+
+
+layers {
+    name: "German_data"
+    type: HDF5_DATA
+    top: "German_data"
+    top: "German_label"
+    hdf5_data_param {
+        source: "caffe/feat/German/dev.list"
+        batch_size: 256
+    }
+    include: { phase: TEST }
+}
+layers {
+    name: "German_input_ip_first"
+    type: INNER_PRODUCT
+    bottom: "German_data"
+    top: "German_input_ip_last"
+    inner_product_param {
+        num_output: 2048
+        weight_filler {
+            type: "xavier"
+        }
+        bias_filler {
+            type: "xavier"
+        }
+    }
+
+}
+
+layers {
+    name: "German_input_sig_last"
+    type: SIGMOID
+    bottom: "German_input_ip_last"
+    top: "German_input_ip_last" 
+}
+layers {
+    name: "German_mid_sharing_ip_first"
+    type: INNER_PRODUCT
+    bottom: "German_input_ip_last"
+    top: "German_mid_sharing_ip_first"
+    inner_product_param {
+        num_output: 2048
+        weight_filler {
+            type: "xavier"
+        }
+        bias_filler {
+            type: "xavier"
+        }
+    }
+    param: "mid_sharing_ip_first_w" 
+    param: "mid_sharing_ip_first_b" 
+}
+
+layers {
+    name: "German_mid_sharing_sig_first"
+    type: SIGMOID
+    bottom: "German_mid_sharing_ip_first"
+    top: "German_mid_sharing_ip_first"
+}
+
+layers {
+    name: "German_mid_sharing_ip_1"
+    type: INNER_PRODUCT
+    bottom: "German_mid_sharing_ip_first"
+    top: "German_mid_sharing_ip_1"
+    inner_product_param {
+        num_output: 2048
+        weight_filler {
+            type: "xavier"
+        }
+        bias_filler {
+            type: "xavier"
+        }
+    }
+    param: "mid_sharing_ip_1_w" 
+    param: "mid_sharing_ip_1_b" 
+}
+
+layers {
+    name: "German_mid_sharing_sig_1"
+    type: SIGMOID
+    bottom: "German_mid_sharing_ip_1"
+    top: "German_mid_sharing_ip_1"
+}
+
+layers {
+    name: "German_mid_sharing_ip_last"
+    type: INNER_PRODUCT
+    bottom: "German_mid_sharing_ip_1"
+    top: "German_mid_sharing_ip_last"
+    inner_product_param {
+        num_output: 2048
+        weight_filler {
+            type: "xavier"
+        }
+        bias_filler {
+            type: "xavier"
+        }
+    }
+    param: "mid_sharing_ip_last_w"
+    param: "mid_sharing_ip_last_b" 
+}
+
+layers {
+    name: "German_mid_sharing_sig_last"
+    type: SIGMOID
+    bottom: "German_mid_sharing_ip_last"
+    top: "German_mid_sharing_ip_last"
+}
+layers {
+    name: "German_output_ip_first"
+    type: INNER_PRODUCT
+    bottom: "German_mid_sharing_ip_last"
+    top: "German_output_ip_first"
+    inner_product_param {
+        num_output: 2563
+        weight_filler {
+            type: "xavier"
+        }
+        bias_filler {   
+            type: "xavier"
+        }
+    }
+}
+
+layers {
+    name: "German_output_softmax_loss"
+    type: SOFTMAX_LOSS
+    bottom: "German_output_ip_first"
+    bottom: "German_label"
+    top: "German_loss"
+    include: { phase: TRAIN }
+}
+
+layers {
+    name: "German_output_accuracy"
+    type: ACCURACY
+    bottom: "German_output_ip_first"
+    bottom: "German_label"
+    top: "German_accuracy"
+    include: { phase: TEST }
+}

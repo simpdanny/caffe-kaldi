@@ -1,0 +1,96 @@
+name: "German_deploy"
+input: "German_data"
+input_dim: 1
+input_dim: 621
+input_dim: 1
+input_dim: 1
+layers {
+    name: "German_input_ip_first"
+    type: INNER_PRODUCT
+    bottom: "German_data"
+    top: "German_input_ip_last"
+    inner_product_param {
+        num_output: 2048
+    }
+
+}
+
+layers {
+    name: "German_input_sig_last"
+    type: SIGMOID
+    bottom: "German_input_ip_last"
+    top: "German_input_ip_last" 
+}
+layers {
+    name: "German_mid_sharing_ip_first"
+    type: INNER_PRODUCT
+    bottom: "German_input_ip_last"
+    top: "German_mid_sharing_ip_first"
+    inner_product_param {
+        num_output: 2048
+    }
+    param: "mid_sharing_ip_first_w" 
+    param: "mid_sharing_ip_first_b" 
+}
+
+layers {
+    name: "German_mid_sharing_sig_first"
+    type: SIGMOID
+    bottom: "German_mid_sharing_ip_first"
+    top: "German_mid_sharing_ip_first"
+}
+
+layers {
+    name: "German_mid_sharing_ip_1"
+    type: INNER_PRODUCT
+    bottom: "German_mid_sharing_ip_first"
+    top: "German_mid_sharing_ip_1"
+    inner_product_param {
+        num_output: 2048
+    }
+    param: "mid_sharing_ip_1_w" 
+    param: "mid_sharing_ip_1_b" 
+}
+
+layers {
+    name: "German_mid_sharing_sig_1"
+    type: SIGMOID
+    bottom: "German_mid_sharing_ip_1"
+    top: "German_mid_sharing_ip_1"
+}
+
+layers {
+    name: "German_mid_sharing_ip_last"
+    type: INNER_PRODUCT
+    bottom: "German_mid_sharing_ip_1"
+    top: "German_mid_sharing_ip_last"
+    inner_product_param {
+        num_output: 2048
+    }
+    param: "mid_sharing_ip_last_w"
+    param: "mid_sharing_ip_last_b" 
+}
+
+layers {
+    name: "German_mid_sharing_sig_last"
+    type: SIGMOID
+    bottom: "German_mid_sharing_ip_last"
+    top: "German_mid_sharing_ip_last"
+}
+layers {
+    name: "German_output_ip_first"
+    type: INNER_PRODUCT
+    bottom: "German_mid_sharing_ip_last"
+    top: "German_output_ip_first"
+    inner_product_param {
+        num_output: 2563
+    }
+}
+
+layers {
+    name: "German_output_softmax"
+    type: SOFTMAX
+    bottom: "German_output_ip_first"
+    top: "German_output_softmax"
+}
+
